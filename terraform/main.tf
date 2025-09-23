@@ -61,16 +61,18 @@ resource "azurerm_redis_cache" "main" {
   tags = var.common_tags
 }
 
-
 # Application Insights
 resource "azurerm_application_insights" "main" {
   name                = var.app_insights_name
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   application_type    = "web"
-  workspace_id        = null
 
   tags = var.common_tags
+
+  lifecycle {
+    ignore_changes = [workspace_id]  # 🔹 evita que Terraform intente removerlo
+  }
 }
 
 # App Services for each microservice
