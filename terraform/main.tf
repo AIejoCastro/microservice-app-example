@@ -71,7 +71,7 @@ resource "azurerm_application_insights" "main" {
   tags = var.common_tags
 
   lifecycle {
-    ignore_changes = [workspace_id]  # 🔹 evita que Terraform intente removerlo
+    ignore_changes = [workspace_id] # 🔹 evita que Terraform intente removerlo
   }
 }
 
