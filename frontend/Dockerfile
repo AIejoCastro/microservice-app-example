@@ -3,7 +3,9 @@ FROM node:16-alpine as build-stage
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --omit=dev
+
+# Instala TODAS las dependencias (prod + dev) para poder hacer el build
+RUN npm install
 
 COPY . .
 RUN npm run build
