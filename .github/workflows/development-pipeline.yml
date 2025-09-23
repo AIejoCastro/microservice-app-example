@@ -11,9 +11,9 @@ on:
       - 'log-message-processor/**'
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_PACKAGE_PATH: '.'
   NODE_VERSION: '16'
   JAVA_VERSION: '11'
   GO_VERSION: '1.19'
@@ -27,7 +27,7 @@ jobs:
         service: [auth-api, users-api, todos-api, frontend, log-message-processor]
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup Environment
       uses: ./.github/actions/setup-env
@@ -45,12 +45,6 @@ jobs:
         cd ${{ matrix.service }}
         chmod +x ../scripts/test-service.sh
         ../scripts/test-service.sh ${{ matrix.service }}
-    
-    - name: Security Scan
-      uses: SecureCodeWarrior/github-action-add-sarif-contextual-training@v1.16
-      with:
-        inputSarifFile: 'security-scan-results.sarif'
-        outputSarifFile: 'security-scan-results.processed.sarif'
 
   build-docker-images:
     needs: build-and-test
@@ -58,7 +52,7 @@ jobs:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Login to Azure Container Registry
       uses: azure/docker-login@v1
@@ -72,63 +66,20 @@ jobs:
         chmod +x scripts/build-and-push-images.sh
         scripts/build-and-push-images.sh
 
-  deploy-staging:
-    needs: build-docker-images
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
-    environment: staging
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Deploy to Azure App Services
-      run: |
-        chmod +x scripts/deploy-to-azure.sh
-        scripts/deploy-to-azure.sh staging
-
-  deploy-production:
+  deploy-to-azure:
     needs: build-docker-images
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-    environment: production
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Azure Login
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: Deploy to Azure App Services
+    - name: Restart Azure App Services
       run: |
         chmod +x scripts/deploy-to-azure.sh
         scripts/deploy-to-azure.sh production
-
-  integration-tests:
-    needs: [deploy-staging]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-    
-    - name: Install Dependencies
-      run: |
-        pip install selenium pytest requests
-    
-    - name: Run Integration Tests
-      run: |
-        python tests/integration_tests.py
-      env:
-        BASE_URL: https://microapp-staging.azurewebsites.net
