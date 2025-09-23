@@ -16,7 +16,7 @@ on:
 env:
   NODE_VERSION: '16'
   JAVA_VERSION: '11'
-  GO_VERSION: '1.19'
+  GO_VERSION: '1.25'
   PYTHON_VERSION: '3.9'
 
 jobs:
