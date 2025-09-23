@@ -34,14 +34,12 @@ jobs:
       with:
         service: ${{ matrix.service }}
 
-    - name: Setup Python 2 for node-gyp (frontend only)
+    - name: Rebuild frontend dependencies safely
       if: matrix.service == 'frontend'
       run: |
-        sudo apt-get update
-        sudo apt-get install -y python2 make g++ 
-        sudo ln -s /usr/bin/python2 /usr/bin/python || true
-        npm config set python /usr/bin/python2
-        npm rebuild node-sass
+        cd frontend
+        npm install --legacy-peer-deps --ignore-scripts
+        npm rebuild node-sass --force
 
     - name: Build Service
       run: |
