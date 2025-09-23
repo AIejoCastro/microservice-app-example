@@ -21,11 +21,10 @@ env:
 
 jobs:
   build-and-test:
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         service: [auth-api, users-api, todos-api, frontend, log-message-processor]
-    
-    runs-on: ${{ matrix.service == 'frontend' && 'ubuntu-20.04' || 'ubuntu-latest' }}
     
     steps:
     - uses: actions/checkout@v4
@@ -69,7 +68,7 @@ jobs:
 
   build-docker-images:
     needs: build-and-test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
     
     steps:
@@ -89,7 +88,7 @@ jobs:
 
   deploy-to-azure:
     needs: build-docker-images
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: github.ref == 'refs/heads/master'
     
     steps:
