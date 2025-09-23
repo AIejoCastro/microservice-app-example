@@ -21,7 +21,7 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         service: [auth-api, users-api, todos-api, frontend, log-message-processor]
@@ -68,7 +68,7 @@ jobs:
 
   build-docker-images:
     needs: build-and-test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
     
     steps:
@@ -88,7 +88,7 @@ jobs:
 
   deploy-to-azure:
     needs: build-docker-images
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     
     steps:
