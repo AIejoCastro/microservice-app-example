@@ -24,7 +24,16 @@ var (
 )
 
 func main() {
-	hostport := ":" + os.Getenv("AUTH_API_PORT")
+	// Detect port (Azure usa PORT, local podrías usar AUTH_API_PORT)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = os.Getenv("AUTH_API_PORT")
+	}
+	if port == "" {
+		port = "8000" // valor por defecto
+	}
+	hostport := ":" + port
+
 	userAPIAddress := os.Getenv("USERS_API_ADDRESS")
 
 	envJwtSecret := os.Getenv("JWT_SECRET")
@@ -62,7 +71,6 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	// Route => handler
 	e.GET("/version", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Auth API, written in Go\n")
 	})

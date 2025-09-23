@@ -31,7 +31,7 @@ USER spring
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8083/actuator/health || exit 1
 
-EXPOSE 8083
+EXPOSE 8000
 
 # JVM optimizations for containers
 ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"

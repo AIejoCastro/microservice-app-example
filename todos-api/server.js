@@ -29,7 +29,7 @@ const redisClient = require("redis").createClient({
       return Math.min(options.attempt * 100, 2000);
   }        
 });
-const port = process.env.TODO_API_PORT || 8082
+const port = process.env.TODO_API_PORT || 8000
 const jwtSecret = process.env.JWT_SECRET || "foo"
 
 const app = express()
