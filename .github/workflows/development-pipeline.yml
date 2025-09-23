@@ -21,10 +21,11 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         service: [auth-api, users-api, todos-api, frontend, log-message-processor]
+    
+    runs-on: ${{ matrix.service == 'frontend' && 'ubuntu-20.04' || 'ubuntu-latest' }}
     
     steps:
     - uses: actions/checkout@v4
@@ -40,13 +41,12 @@ jobs:
       with:
         node-version: '14'
 
-    - name: Configure node-gyp to use Python 3 (only frontend)
+    - name: Install Python2 for node-gyp (frontend only)
       if: matrix.service == 'frontend'
       run: |
         sudo apt-get update
-        sudo apt-get install -y make g++ gcc python3 python3-pip
-        npm config set python python3
-
+        sudo apt-get install -y python2 make g++ gcc
+        npm config set python python2
 
     - name: Rebuild frontend dependencies safely
       if: matrix.service == 'frontend'
