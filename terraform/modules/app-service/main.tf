@@ -34,11 +34,11 @@ resource "azurerm_linux_web_app" "main" {
 
   # App settings incluyendo credenciales del registry
   app_settings = merge(var.app_settings, {
-    "DOCKER_REGISTRY_SERVER_URL"      = var.docker_registry_url
-    "DOCKER_REGISTRY_SERVER_USERNAME" = var.docker_registry_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD" = var.docker_registry_password
+    "DOCKER_REGISTRY_SERVER_URL"          = var.docker_registry_url
+    "DOCKER_REGISTRY_SERVER_USERNAME"     = var.docker_registry_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD"     = var.docker_registry_password
     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-    "WEBSITE_ENABLE_SYNC_UPDATE_SITE" = "true"
+    "WEBSITE_ENABLE_SYNC_UPDATE_SITE"     = "true"
   })
 
   # Identity para acceder a otros recursos de Azure

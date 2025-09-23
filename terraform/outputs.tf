@@ -17,10 +17,10 @@ output "redis_hostname" {
 output "app_urls" {
   description = "URLs of the deployed applications"
   value = {
-    frontend   = "https://${module.frontend.app_url}"
-    auth_api   = "https://${module.auth_api.app_url}"
-    users_api  = "https://${module.users_api.app_url}"
-    todos_api  = "https://${module.todos_api.app_url}"
+    frontend  = "https://${module.frontend.app_url}"
+    auth_api  = "https://${module.auth_api.app_url}"
+    users_api = "https://${module.users_api.app_url}"
+    todos_api = "https://${module.todos_api.app_url}"
   }
 }
 

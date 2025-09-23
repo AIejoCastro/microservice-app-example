@@ -6,10 +6,10 @@ terraform {
       version = "~> 3.0"
     }
   }
-  
+
   backend "azurerm" {
     resource_group_name  = "tfstate-rg"
-    storage_account_name = "tfsa1758595608"  # <- Cambiar por tu storage
+    storage_account_name = "tfsa1758595608" # <- Cambiar por tu storage
     container_name       = "tfstate"
     key                  = "terraform.tfstate"
   }
@@ -80,101 +80,101 @@ resource "azurerm_application_insights" "main" {
 # App Services for each microservice
 module "auth_api" {
   source = "./modules/app-service"
-  
-  app_name                   = "${var.app_name_prefix}-auth"
-  resource_group_name        = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  service_plan_id            = azurerm_service_plan.main.id
-  
-  docker_image               = "auth-api:latest"
-  docker_registry_url        = "https://${azurerm_container_registry.main.login_server}"
-  docker_registry_username   = azurerm_container_registry.main.admin_username
-  docker_registry_password   = azurerm_container_registry.main.admin_password
-  
+
+  app_name            = "${var.app_name_prefix}-auth"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  service_plan_id     = azurerm_service_plan.main.id
+
+  docker_image             = "auth-api:latest"
+  docker_registry_url      = "https://${azurerm_container_registry.main.login_server}"
+  docker_registry_username = azurerm_container_registry.main.admin_username
+  docker_registry_password = azurerm_container_registry.main.admin_password
+
   app_settings = {
-    REDIS_HOST                      = azurerm_redis_cache.main.hostname
-    REDIS_PORT                      = azurerm_redis_cache.main.port
-    REDIS_PASSWORD                  = azurerm_redis_cache.main.primary_access_key
-    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
-    JWT_SECRET                      = "your-secure-jwt-secret-change-in-production"
-    GIN_MODE                        = "release"
+    REDIS_HOST                     = azurerm_redis_cache.main.hostname
+    REDIS_PORT                     = azurerm_redis_cache.main.port
+    REDIS_PASSWORD                 = azurerm_redis_cache.main.primary_access_key
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.main.instrumentation_key
+    JWT_SECRET                     = "your-secure-jwt-secret-change-in-production"
+    GIN_MODE                       = "release"
   }
-  
+
   tags = var.common_tags
 }
 
 module "users_api" {
   source = "./modules/app-service"
-  
-  app_name                   = "${var.app_name_prefix}-users"
-  resource_group_name        = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  service_plan_id            = azurerm_service_plan.main.id
-  
-  docker_image               = "users-api:latest"
-  docker_registry_url        = "https://${azurerm_container_registry.main.login_server}"
-  docker_registry_username   = azurerm_container_registry.main.admin_username
-  docker_registry_password   = azurerm_container_registry.main.admin_password
-  
+
+  app_name            = "${var.app_name_prefix}-users"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  service_plan_id     = azurerm_service_plan.main.id
+
+  docker_image             = "users-api:latest"
+  docker_registry_url      = "https://${azurerm_container_registry.main.login_server}"
+  docker_registry_username = azurerm_container_registry.main.admin_username
+  docker_registry_password = azurerm_container_registry.main.admin_password
+
   app_settings = {
-    REDIS_HOST                      = azurerm_redis_cache.main.hostname
-    REDIS_PORT                      = azurerm_redis_cache.main.port
-    REDIS_PASSWORD                  = azurerm_redis_cache.main.primary_access_key
-    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
-    SPRING_PROFILES_ACTIVE          = "docker"
-    CACHE_TTL                       = "3600"
+    REDIS_HOST                     = azurerm_redis_cache.main.hostname
+    REDIS_PORT                     = azurerm_redis_cache.main.port
+    REDIS_PASSWORD                 = azurerm_redis_cache.main.primary_access_key
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.main.instrumentation_key
+    SPRING_PROFILES_ACTIVE         = "docker"
+    CACHE_TTL                      = "3600"
   }
-  
+
   tags = var.common_tags
 }
 
 module "todos_api" {
   source = "./modules/app-service"
-  
-  app_name                   = "${var.app_name_prefix}-todos"
-  resource_group_name        = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  service_plan_id            = azurerm_service_plan.main.id
-  
-  docker_image               = "todos-api:latest"
-  docker_registry_url        = "https://${azurerm_container_registry.main.login_server}"
-  docker_registry_username   = azurerm_container_registry.main.admin_username
-  docker_registry_password   = azurerm_container_registry.main.admin_password
-  
+
+  app_name            = "${var.app_name_prefix}-todos"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  service_plan_id     = azurerm_service_plan.main.id
+
+  docker_image             = "todos-api:latest"
+  docker_registry_url      = "https://${azurerm_container_registry.main.login_server}"
+  docker_registry_username = azurerm_container_registry.main.admin_username
+  docker_registry_password = azurerm_container_registry.main.admin_password
+
   app_settings = {
-    REDIS_HOST                      = azurerm_redis_cache.main.hostname
-    REDIS_PORT                      = azurerm_redis_cache.main.port
-    REDIS_PASSWORD                  = azurerm_redis_cache.main.primary_access_key
-    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
-    NODE_ENV                        = "production"
-    CACHE_TTL                       = "1800"
+    REDIS_HOST                     = azurerm_redis_cache.main.hostname
+    REDIS_PORT                     = azurerm_redis_cache.main.port
+    REDIS_PASSWORD                 = azurerm_redis_cache.main.primary_access_key
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.main.instrumentation_key
+    NODE_ENV                       = "production"
+    CACHE_TTL                      = "1800"
   }
-  
+
   tags = var.common_tags
 }
 
 module "frontend" {
   source = "./modules/app-service"
-  
-  app_name                   = "${var.app_name_prefix}-frontend"
-  resource_group_name        = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  service_plan_id            = azurerm_service_plan.main.id
-  
-  docker_image               = "frontend:latest"
-  docker_registry_url        = "https://${azurerm_container_registry.main.login_server}"
-  docker_registry_username   = azurerm_container_registry.main.admin_username
-  docker_registry_password   = azurerm_container_registry.main.admin_password
-  
+
+  app_name            = "${var.app_name_prefix}-frontend"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  service_plan_id     = azurerm_service_plan.main.id
+
+  docker_image             = "frontend:latest"
+  docker_registry_url      = "https://${azurerm_container_registry.main.login_server}"
+  docker_registry_username = azurerm_container_registry.main.admin_username
+  docker_registry_password = azurerm_container_registry.main.admin_password
+
   app_settings = {
-    VUE_APP_AUTH_API_URL            = "https://${var.app_name_prefix}-auth.azurewebsites.net"
-    VUE_APP_USERS_API_URL           = "https://${var.app_name_prefix}-users.azurewebsites.net"
-    VUE_APP_TODOS_API_URL           = "https://${var.app_name_prefix}-todos.azurewebsites.net"
-    VUE_APP_CIRCUIT_BREAKER_TIMEOUT = "5000"
+    VUE_APP_AUTH_API_URL              = "https://${var.app_name_prefix}-auth.azurewebsites.net"
+    VUE_APP_USERS_API_URL             = "https://${var.app_name_prefix}-users.azurewebsites.net"
+    VUE_APP_TODOS_API_URL             = "https://${var.app_name_prefix}-todos.azurewebsites.net"
+    VUE_APP_CIRCUIT_BREAKER_TIMEOUT   = "5000"
     VUE_APP_CIRCUIT_BREAKER_THRESHOLD = "5"
-    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
+    APPINSIGHTS_INSTRUMENTATIONKEY    = azurerm_application_insights.main.instrumentation_key
   }
-  
+
   tags = var.common_tags
 }
 
