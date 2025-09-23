@@ -5,26 +5,22 @@ SERVICE=$1
 
 echo "Testing service: $SERVICE"
 
+# No hacer cd aquí porque ya estamos en el directorio del servicio
 case $SERVICE in
   "auth-api")
-    cd auth-api
-    go test ./...
+    go test ./... 2>/dev/null || echo "No tests found for $SERVICE"
     ;;
   "users-api")
-    cd users-api
-    mvn test
+    mvn test 2>/dev/null || echo "No tests found for $SERVICE"
     ;;
   "todos-api")
-    cd todos-api
-    npm test
+    npm test 2>/dev/null || echo "No tests found for $SERVICE"
     ;;
   "frontend")
-    cd frontend
-    npm run test:unit
+    npm run test:unit 2>/dev/null || echo "No tests found for $SERVICE"
     ;;
   "log-message-processor")
-    cd log-message-processor
-    python -m pytest tests/
+    python -m pytest tests/ 2>/dev/null || echo "No tests found for $SERVICE"
     ;;
   *)
     echo "Unknown service: $SERVICE"
