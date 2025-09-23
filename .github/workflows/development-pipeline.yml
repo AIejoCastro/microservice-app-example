@@ -40,11 +40,12 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: Install Python2 for node-gyp (only frontend)
+    - name: Configure node-gyp to use Python 3 (only frontend)
       if: matrix.service == 'frontend'
       run: |
         sudo apt-get update
-        sudo apt-get install -y python-is-python2 make g++ gcc
+        sudo apt-get install -y make g++ gcc python3 python3-pip
+        npm config set python python3
 
     - name: Rebuild frontend dependencies safely
       if: matrix.service == 'frontend'
