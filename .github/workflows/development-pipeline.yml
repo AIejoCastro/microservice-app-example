@@ -34,6 +34,12 @@ jobs:
       with:
         service: ${{ matrix.service }}
 
+    - name: Setup Node.js 14 for frontend
+      if: matrix.service == 'frontend'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '14'
+
     - name: Rebuild frontend dependencies safely
       if: matrix.service == 'frontend'
       run: |
