@@ -52,7 +52,6 @@ jobs:
       run: |
         cd frontend
         npm install --legacy-peer-deps
-        npm rebuild node-sass --force
 
     - name: Build Service
       run: |
@@ -74,12 +73,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Login to Azure Container Registry
-      uses: azure/docker-login@v1
+    - name: Azure Login
+      uses: azure/login@v1
       with:
-        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Docker Login to ACR
+      uses: docker/login-action@v2
+      with:
+        registry: <TU-REGISTRO>.azurecr.io
+        username: ${{ secrets.ARM_CLIENT_ID }}
+        password: ${{ secrets.ARM_CLIENT_SECRET }}
     
     - name: Build and Push Docker Images
       run: |
