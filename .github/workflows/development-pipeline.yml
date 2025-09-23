@@ -13,12 +13,6 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
-env:
-  NODE_VERSION: '16'
-  JAVA_VERSION: '11'
-  GO_VERSION: '1.21'   # <-- bajé de 1.25 a 1.21 porque era la estable
-  PYTHON_VERSION: '3.9'
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -34,14 +28,6 @@ jobs:
       with:
         service: ${{ matrix.service }}
 
-    # Fix especial para frontend (node-sass necesita Python2)
-    - name: Install Python 2 for node-gyp
-      if: matrix.service == 'frontend'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y python2
-        npm config set python python2
-    
     - name: Build Service
       run: |
         cd ${{ matrix.service }}

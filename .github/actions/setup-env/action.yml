@@ -24,14 +24,14 @@ runs:
         distribution: 'temurin'
         cache: 'maven'
     
-    - name: Setup Go
-      if: ${{ inputs.service == 'auth-api' }}
-      uses: actions/setup-go@v3
+    - name: Setup Node.js
+      if: ${{ inputs.service == 'frontend' || inputs.service == 'todos-api' }}
+      uses: actions/setup-node@v3
       with:
-        go-version: '1.21'
-        cache: true
-        cache-dependency-path: ${{ inputs.service }}/go.sum
-    
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: ${{ inputs.service }}/package-lock.json
+
     - name: Setup Python
       if: ${{ inputs.service == 'log-message-processor' }}
       uses: actions/setup-python@v4
