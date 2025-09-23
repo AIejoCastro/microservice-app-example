@@ -29,16 +29,8 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: ${{ env.TF_VERSION }}
-
-    # Autoformatea en push a main
-    - name: Terraform Format
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      working-directory: terraform
-      run: terraform fmt -recursive
-
-    # Solo valida formato en PRs
+    
     - name: Terraform Format Check
-      if: github.event_name == 'pull_request'
       working-directory: terraform
       run: terraform fmt -check -recursive
     
@@ -53,7 +45,6 @@ jobs:
   terraform-plan:
     needs: terraform-validate
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     
     steps:
     - uses: actions/checkout@v3
@@ -73,6 +64,7 @@ jobs:
       id: plan
     
     - name: Comment PR
+      if: github.event_name == 'pull_request'
       uses: actions/github-script@v6
       env:
         PLAN: "${{ steps.plan.outputs.stdout }}"
@@ -90,9 +82,8 @@ jobs:
           });
 
   terraform-apply:
-    needs: terraform-validate
+    needs: terraform-plan
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
     
     steps:
