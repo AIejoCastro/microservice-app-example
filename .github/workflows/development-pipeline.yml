@@ -38,7 +38,7 @@ jobs:
       if: matrix.service == 'frontend'
       run: |
         cd frontend
-        npm install --legacy-peer-deps --ignore-scripts
+        npm install --legacy-peer-deps
         npm rebuild node-sass --force
 
     - name: Build Service
