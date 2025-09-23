@@ -1,0 +1,134 @@
+name: Development Pipeline
+
+on:
+  push:
+    branches: [ develop, main ]
+    paths:
+      - 'auth-api/**'
+      - 'users-api/**'
+      - 'todos-api/**'
+      - 'frontend/**'
+      - 'log-message-processor/**'
+  pull_request:
+    branches: [ main ]
+
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  NODE_VERSION: '16'
+  JAVA_VERSION: '11'
+  GO_VERSION: '1.19'
+  PYTHON_VERSION: '3.9'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [auth-api, users-api, todos-api, frontend, log-message-processor]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Environment
+      uses: ./.github/actions/setup-env
+      with:
+        service: ${{ matrix.service }}
+    
+    - name: Build Service
+      run: |
+        cd ${{ matrix.service }}
+        chmod +x ../scripts/build-service.sh
+        ../scripts/build-service.sh ${{ matrix.service }}
+    
+    - name: Run Tests
+      run: |
+        cd ${{ matrix.service }}
+        chmod +x ../scripts/test-service.sh
+        ../scripts/test-service.sh ${{ matrix.service }}
+    
+    - name: Security Scan
+      uses: SecureCodeWarrior/github-action-add-sarif-contextual-training@v1.16
+      with:
+        inputSarifFile: 'security-scan-results.sarif'
+        outputSarifFile: 'security-scan-results.processed.sarif'
+
+  build-docker-images:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Login to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - name: Build and Push Docker Images
+      run: |
+        chmod +x scripts/build-and-push-images.sh
+        scripts/build-and-push-images.sh
+
+  deploy-staging:
+    needs: build-docker-images
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Deploy to Azure App Services
+      run: |
+        chmod +x scripts/deploy-to-azure.sh
+        scripts/deploy-to-azure.sh staging
+
+  deploy-production:
+    needs: build-docker-images
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Deploy to Azure App Services
+      run: |
+        chmod +x scripts/deploy-to-azure.sh
+        scripts/deploy-to-azure.sh production
+
+  integration-tests:
+    needs: [deploy-staging]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install Dependencies
+      run: |
+        pip install selenium pytest requests
+    
+    - name: Run Integration Tests
+      run: |
+        python tests/integration_tests.py
+      env:
+        BASE_URL: https://microapp-staging.azurewebsites.net
