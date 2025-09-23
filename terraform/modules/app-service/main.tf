@@ -5,54 +5,21 @@ resource "azurerm_linux_web_app" "main" {
   service_plan_id     = var.service_plan_id
 
   site_config {
-    # Configuración de contenedor (para stacks estándar, OJO: algunos providers ya no soportan docker_image_name aquí)
-    application_stack {
-      docker_image_name   = var.docker_image
-      docker_registry_url = var.docker_registry_url
-    }
-
-    # Health check configuration (Circuit Breaker Pattern)
-    health_check_path                 = "/health"
-    health_check_eviction_time_in_min = 5
-
-    # Always on para mejor performance
+    # Configuración básica para contenedores Docker
     always_on = true
-
-    # Detailed error logging (sí es válido aquí)
-    detailed_error_logging_enabled = true
   }
 
-  # Logs de la aplicación
-  logs {
-    http_logs {
-      file_system {
-        retention_in_days = 7
-        retention_in_mb   = 35
-      }
-    }
-  }
-
-  # App settings incluyendo credenciales del registry
   app_settings = merge(var.app_settings, {
-    "DOCKER_REGISTRY_SERVER_URL"          = var.docker_registry_url
-    "DOCKER_REGISTRY_SERVER_USERNAME"     = var.docker_registry_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD"     = var.docker_registry_password
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-    "WEBSITE_ENABLE_SYNC_UPDATE_SITE"     = "true"
+    # Configuración específica para Docker
+    DOCKER_ENABLE_CI = "true"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
   })
-
-  # Identity para acceder a otros recursos de Azure
-  identity {
-    type = "SystemAssigned"
-  }
 
   tags = var.tags
 }
-
-
-# Auto-scaling rules (Autoscaling Pattern)
+# Fix autoscaling - only one per App Service Plan
 resource "azurerm_monitor_autoscale_setting" "main" {
-  count               = var.enable_autoscaling ? 1 : 0
+  count               = var.enable_autoscaling && var.create_autoscale ? 1 : 0
   name                = "${var.app_name}-autoscale"
   resource_group_name = var.resource_group_name
   location            = var.location

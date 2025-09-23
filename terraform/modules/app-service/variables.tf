@@ -19,24 +19,8 @@ variable "service_plan_id" {
 }
 
 variable "docker_image" {
-  description = "Docker image name for the app (without registry URL)"
+  description = "Docker image for the app"
   type        = string
-}
-
-variable "docker_registry_url" {
-  description = "Docker registry URL"
-  type        = string
-}
-
-variable "docker_registry_username" {
-  description = "Docker registry username"
-  type        = string
-}
-
-variable "docker_registry_password" {
-  description = "Docker registry password"
-  type        = string
-  sensitive   = true
 }
 
 variable "app_settings" {
@@ -49,6 +33,12 @@ variable "enable_autoscaling" {
   description = "Enable autoscaling for the app"
   type        = bool
   default     = true
+}
+
+variable "create_autoscale" {
+  description = "Whether to create autoscale setting (only one per App Service Plan)"
+  type        = bool
+  default     = false
 }
 
 variable "tags" {
