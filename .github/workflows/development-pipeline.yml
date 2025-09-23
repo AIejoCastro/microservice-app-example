@@ -40,12 +40,12 @@ jobs:
       with:
         node-version: '14'
 
-    - name: Install Python2 for node-gyp (frontend only)
+    - name: Install build tools (frontend only)
       if: matrix.service == 'frontend'
       run: |
         sudo apt-get update
-        sudo apt-get install -y python2.7 python-is-python2 make g++ gcc
-        npm config set python python2
+        sudo apt-get install -y make g++ gcc
+        npm config set python python3
 
     - name: Rebuild frontend dependencies safely
       if: matrix.service == 'frontend'
