@@ -38,10 +38,11 @@ jobs:
       if: matrix.service == 'frontend'
       run: |
         sudo apt-get update
-        sudo apt-get install -y python2
-        sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+        sudo apt-get install -y python2 make g++ 
+        sudo ln -s /usr/bin/python2 /usr/bin/python || true
         npm config set python /usr/bin/python2
-    
+        npm rebuild node-sass
+
     - name: Build Service
       run: |
         cd ${{ matrix.service }}
