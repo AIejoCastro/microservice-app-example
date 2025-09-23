@@ -34,11 +34,18 @@ jobs:
       with:
         service: ${{ matrix.service }}
 
-    - name: Setup Node.js 14 for frontend
+    - name: Setup Node.js for frontend
       if: matrix.service == 'frontend'
       uses: actions/setup-node@v4
       with:
-        node-version: '14'
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install Python2 for node-gyp (only frontend)
+      if: matrix.service == 'frontend'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python2 make g++ gcc
+        sudo ln -sf /usr/bin/python2 /usr/bin/python
 
     - name: Rebuild frontend dependencies safely
       if: matrix.service == 'frontend'
@@ -46,6 +53,7 @@ jobs:
         cd frontend
         npm install --legacy-peer-deps
         npm rebuild node-sass --force
+    # -------------------
 
     - name: Build Service
       run: |
