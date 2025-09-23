@@ -13,10 +13,6 @@ on:
 
 env:
   TF_VERSION: 1.5.0
-  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
 jobs:
   terraform-validate:
@@ -58,10 +54,7 @@ jobs:
     - name: Azure Login
       uses: azure/login@v1
       with:
-        client-id: ${{ secrets.ARM_CLIENT_ID }}
-        tenant-id: ${{ secrets.ARM_TENANT_ID }}
-        subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        client-secret: ${{ secrets.ARM_CLIENT_SECRET }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Terraform Init
       working-directory: terraform
@@ -106,10 +99,7 @@ jobs:
     - name: Azure Login
       uses: azure/login@v1
       with:
-        client-id: ${{ secrets.ARM_CLIENT_ID }}
-        tenant-id: ${{ secrets.ARM_TENANT_ID }}
-        subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        client-secret: ${{ secrets.ARM_CLIENT_SECRET }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Terraform Init
       working-directory: terraform
