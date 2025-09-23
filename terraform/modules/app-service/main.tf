@@ -5,19 +5,17 @@ resource "azurerm_linux_web_app" "main" {
   service_plan_id     = var.service_plan_id
 
   site_config {
-    # Configuración básica para contenedores Docker
     always_on = true
   }
 
   app_settings = merge(var.app_settings, {
-    # Configuración específica para Docker
-    DOCKER_ENABLE_CI = "true"
+    DOCKER_ENABLE_CI                    = "true"
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
   })
 
   tags = var.tags
 }
-# Fix autoscaling - only one per App Service Plan
+
 resource "azurerm_monitor_autoscale_setting" "main" {
   count               = var.enable_autoscaling && var.create_autoscale ? 1 : 0
   name                = "${var.app_name}-autoscale"

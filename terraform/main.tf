@@ -1,18 +1,18 @@
 # App Services for each microservice
 module "auth_api" {
   source = "./modules/app-service"
-  
+
   app_name            = "${var.app_name_prefix}-auth"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.main.id
-  
+
   # Formato correcto para docker_image
   docker_image = "${azurerm_container_registry.main.login_server}/auth-api:latest"
-  
+
   enable_autoscaling = var.enable_autoscaling
   create_autoscale   = true
-  
+
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.main.login_server}"
     DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.main.admin_username
@@ -22,24 +22,24 @@ module "auth_api" {
     REDIS_PASSWORD                  = azurerm_redis_cache.main.primary_access_key
     APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
   }
-  
+
   tags = var.common_tags
 }
 
 module "users_api" {
   source = "./modules/app-service"
-  
+
   app_name            = "${var.app_name_prefix}-users"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.main.id
-  
+
   docker_image = "${azurerm_container_registry.main.login_server}/users-api:latest"
-  
+
   # Don't create autoscale - already created by auth_api
   enable_autoscaling = false
   create_autoscale   = false
-  
+
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL      = azurerm_container_registry.main.login_server
     DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.main.admin_username
@@ -49,24 +49,24 @@ module "users_api" {
     REDIS_PASSWORD                  = azurerm_redis_cache.main.primary_access_key
     APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
   }
-  
+
   tags = var.common_tags
 }
 
 module "todos_api" {
   source = "./modules/app-service"
-  
+
   app_name            = "${var.app_name_prefix}-todos"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.main.id
-  
+
   docker_image = "${azurerm_container_registry.main.login_server}/todos-api:latest"
-  
+
   # Don't create autoscale - already created by auth_api
   enable_autoscaling = false
   create_autoscale   = false
-  
+
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL      = azurerm_container_registry.main.login_server
     DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.main.admin_username
@@ -76,24 +76,24 @@ module "todos_api" {
     REDIS_PASSWORD                  = azurerm_redis_cache.main.primary_access_key
     APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
   }
-  
+
   tags = var.common_tags
 }
 
 module "frontend" {
   source = "./modules/app-service"
-  
+
   app_name            = "${var.app_name_prefix}-frontend"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.main.id
-  
+
   docker_image = "${azurerm_container_registry.main.login_server}/frontend:latest"
-  
+
   # Don't create autoscale - already created by auth_api
   enable_autoscaling = false
   create_autoscale   = false
-  
+
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL      = azurerm_container_registry.main.login_server
     DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.main.admin_username
@@ -103,7 +103,7 @@ module "frontend" {
     VUE_APP_TODOS_API_URL           = "https://${var.app_name_prefix}-todos.azurewebsites.net"
     APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
   }
-  
+
   tags = var.common_tags
 }
 
