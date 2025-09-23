@@ -10,7 +10,6 @@ fi
 
 echo "Deploying to Azure - Environment: $ENVIRONMENT"
 
-# Set environment-specific variables
 case $ENVIRONMENT in
   "staging")
     RESOURCE_GROUP="microservice-app-staging-rg"
@@ -28,7 +27,6 @@ case $ENVIRONMENT in
     ;;
 esac
 
-# Array de servicios con sus imágenes correspondientes
 declare -A SERVICES
 SERVICES["auth"]="auth-api"
 SERVICES["users"]="users-api"
@@ -47,20 +45,25 @@ for SERVICE in "${!SERVICES[@]}"; do
         --resource-group $RESOURCE_GROUP \
         --linux-fx-version "DOCKER|$REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest"
     
+    # Configurar variables de entorno esenciales
+    echo "Setting app configuration for $APP_NAME..."
+    az webapp config appsettings set \
+        --name $APP_NAME \
+        --resource-group $RESOURCE_GROUP \
+        --settings \
+            PORT=80 \
+            WEBSITES_PORT=80 \
+            WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
+            SCM_DO_BUILD_DURING_DEPLOYMENT=false
+    
     echo "Restarting $APP_NAME..."
     az webapp restart --name $APP_NAME --resource-group $RESOURCE_GROUP
     
     echo "Waiting for $APP_NAME to be ready..."
-    sleep 10
+    sleep 15
     
-    # Verificar el estado
     STATE=$(az webapp show --name $APP_NAME --resource-group $RESOURCE_GROUP --query "state" -o tsv)
     echo "$APP_NAME state: $STATE"
 done
 
 echo "Deployment to $ENVIRONMENT completed!"
-echo "URLs:"
-echo "  Frontend: https://$APP_NAME_PREFIX-frontend.azurewebsites.net"
-echo "  Auth API: https://$APP_NAME_PREFIX-auth.azurewebsites.net"
-echo "  Users API: https://$APP_NAME_PREFIX-users.azurewebsites.net"
-echo "  TODOs API: https://$APP_NAME_PREFIX-todos.azurewebsites.net"
