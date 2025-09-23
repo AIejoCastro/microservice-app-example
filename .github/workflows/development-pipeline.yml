@@ -2,7 +2,7 @@ name: Development Pipeline
 
 on:
   push:
-    branches: [ develop, main ]
+    branches: [ develop, master ]
     paths:
       - 'auth-api/**'
       - 'users-api/**'
@@ -10,7 +10,7 @@ on:
       - 'frontend/**'
       - 'log-message-processor/**'
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 env:
   AZURE_WEBAPP_PACKAGE_PATH: '.'
@@ -55,7 +55,7 @@ jobs:
   build-docker-images:
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
     
     steps:
     - uses: actions/checkout@v3
@@ -94,7 +94,7 @@ jobs:
   deploy-production:
     needs: build-docker-images
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     environment: production
     
     steps:
