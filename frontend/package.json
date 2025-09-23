@@ -75,5 +75,8 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "overrides": {
+    "node-sass": "npm:sass@1.77.0"
+  }
 }
