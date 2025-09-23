@@ -27,6 +27,14 @@ jobs:
       uses: ./.github/actions/setup-env
       with:
         service: ${{ matrix.service }}
+    
+    - name: Setup Python 2 for node-gyp (frontend only)
+      if: matrix.service == 'frontend'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python2
+        sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+        npm config set python /usr/bin/python2
 
     - name: Build Service
       run: |
