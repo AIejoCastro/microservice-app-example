@@ -29,8 +29,16 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: ${{ env.TF_VERSION }}
-    
+
+    # Autoformatea en push a main
+    - name: Terraform Format
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      working-directory: terraform
+      run: terraform fmt -recursive
+
+    # Solo valida formato en PRs
     - name: Terraform Format Check
+      if: github.event_name == 'pull_request'
       working-directory: terraform
       run: terraform fmt -check -recursive
     
