@@ -44,7 +44,7 @@ jobs:
       if: matrix.service == 'frontend'
       run: |
         sudo apt-get update
-        sudo apt-get install -y python2 make g++ gcc
+        sudo apt-get install -y python2.7 python-is-python2 make g++ gcc
         npm config set python python2
 
     - name: Rebuild frontend dependencies safely
