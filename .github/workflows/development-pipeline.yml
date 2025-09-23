@@ -38,14 +38,14 @@ jobs:
       if: matrix.service == 'frontend'
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ env.NODE_VERSION }}
+        node-version: '14'
 
-    - name: Configure node-gyp to use Python 3 (only frontend)
+    - name: Install Python2 for node-gyp (only frontend)
       if: matrix.service == 'frontend'
       run: |
         sudo apt-get update
-        sudo apt-get install -y make g++ gcc python3 python3-pip
-        npm config set python python3
+        sudo apt-get install -y make g++ gcc python2
+        sudo ln -sf /usr/bin/python2 /usr/bin/python
 
     - name: Rebuild frontend dependencies safely
       if: matrix.service == 'frontend'
