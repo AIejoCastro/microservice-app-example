@@ -13,6 +13,12 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+env:
+  NODE_VERSION: '16'
+  JAVA_VERSION: '11'
+  GO_VERSION: '1.21'
+  PYTHON_VERSION: '3.9'
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -27,7 +33,7 @@ jobs:
       uses: ./.github/actions/setup-env
       with:
         service: ${{ matrix.service }}
-    
+
     - name: Setup Python 2 for node-gyp (frontend only)
       if: matrix.service == 'frontend'
       run: |
@@ -35,7 +41,7 @@ jobs:
         sudo apt-get install -y python2
         sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
         npm config set python /usr/bin/python2
-
+    
     - name: Build Service
       run: |
         cd ${{ matrix.service }}
