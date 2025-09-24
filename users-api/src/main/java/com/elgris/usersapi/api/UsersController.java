@@ -4,8 +4,9 @@ import com.elgris.usersapi.models.User;
 import com.elgris.usersapi.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedList;
@@ -32,13 +33,13 @@ public class UsersController {
 
         Object requestAttribute = request.getAttribute("claims");
         if((requestAttribute == null) || !(requestAttribute instanceof Claims)){
-            throw new RuntimeException("Did not receive required data from JWT token");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing JWT claims");
         }
 
         Claims claims = (Claims) requestAttribute;
 
         if (!username.equalsIgnoreCase((String)claims.get("username"))) {
-            throw new AccessDeniedException("No access for requested entity");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No access for requested entity");
         }
 
         return userRepository.findOneByUsername(username);

@@ -42,7 +42,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         } else {
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new ServletException("Missing or invalid Authorization header");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
+                return;
             }
 
             final String token = authHeader.substring(7);
@@ -54,7 +55,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                         .getBody();
                 request.setAttribute("claims", claims);
             } catch (final SignatureException e) {
-                throw new ServletException("Invalid token");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                return;
             }
 
             chain.doFilter(req, res);

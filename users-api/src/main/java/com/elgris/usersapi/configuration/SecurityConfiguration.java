@@ -25,6 +25,7 @@ class HttpSecurityConfiguration {
                 .csrf().disable()
                 .authorizeRequests()
                     .antMatchers("/actuator/health", "/health", "/actuator/health/**").permitAll()
+                    .antMatchers(org.springframework.http.HttpMethod.GET, "/", "/users/").permitAll()
                     .antMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                     .anyRequest().authenticated()
                 .and()
