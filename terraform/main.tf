@@ -180,27 +180,55 @@ module "frontend" {
   tags = var.common_tags
 }
 
-module "log_message_processor" {
-  source = "./modules/app-service"
-
-  app_name            = "${var.app_name_prefix}-logprocessor"
-  resource_group_name = azurerm_resource_group.main.name
+# Container App Environment (para todos los container apps)
+resource "azurerm_container_app_environment" "main" {
+  name                = "${var.app_name_prefix}-cae"
   location            = azurerm_resource_group.main.location
-  service_plan_id     = azurerm_service_plan.main.id
+  resource_group_name = azurerm_resource_group.main.name
+}
 
-  docker_image = "${azurerm_container_registry.main.login_server}/log-message-processor:latest"
+# Log Message Processor como Container App (background worker)
+resource "azurerm_container_app" "log_message_processor" {
+  name                         = "${var.app_name_prefix}-logprocessor"
+  resource_group_name          = azurerm_resource_group.main.name
+  container_app_environment_id = azurerm_container_app_environment.main.id
+  revision_mode                = "Single"
 
-  enable_autoscaling = false
-  create_autoscale   = false
+  template {
+    container {
+      name   = "log-message-processor"
+      image  = "${azurerm_container_registry.main.login_server}/log-message-processor:latest"
+      cpu    = 0.5
+      memory = "1Gi"
 
-  app_settings = {
-    DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.main.login_server}"
-    DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.main.admin_username
-    DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.main.admin_password
-    REDIS_HOST                      = azurerm_redis_cache.main.hostname
-    REDIS_PORT                      = azurerm_redis_cache.main.port
-    REDIS_PASSWORD                  = azurerm_redis_cache.main.primary_access_key
-    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
+      env {
+        name  = "REDIS_HOST"
+        value = azurerm_redis_cache.main.hostname
+      }
+      env {
+        name  = "REDIS_PORT"
+        value = azurerm_redis_cache.main.port
+      }
+      env {
+        name  = "REDIS_PASSWORD"
+        value = azurerm_redis_cache.main.primary_access_key
+      }
+      env {
+        name  = "APPINSIGHTS_INSTRUMENTATIONKEY"
+        value = azurerm_application_insights.main.instrumentation_key
+      }
+    }
+  }
+
+  secret {
+    name  = "acr-admin-password"
+    value = azurerm_container_registry.main.admin_password
+  }
+
+  registry {
+    server                 = azurerm_container_registry.main.login_server
+    username               = azurerm_container_registry.main.admin_username
+    password_secret_name   = "acr-admin-password"
   }
 
   tags = var.common_tags
