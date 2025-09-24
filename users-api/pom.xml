@@ -71,7 +71,8 @@
             <artifactId>h2</artifactId>
         </dependency>
 
-        <!-- Spring Cloud Sleuth + Zipkin -->
+        <!-- ZIPKIN COMENTADO TEMPORALMENTE PARA DEBUGGING -->
+        <!-- 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-sleuth</artifactId>
@@ -80,6 +81,7 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-sleuth-zipkin</artifactId>
         </dependency>
+        -->
 
         <!-- Test -->
         <dependency>
