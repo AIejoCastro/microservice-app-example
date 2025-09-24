@@ -226,9 +226,9 @@ resource "azurerm_container_app" "log_message_processor" {
   }
 
   registry {
-    server                 = azurerm_container_registry.main.login_server
-    username               = azurerm_container_registry.main.admin_username
-    password_secret_name   = "acr-admin-password"
+    server               = azurerm_container_registry.main.login_server
+    username             = azurerm_container_registry.main.admin_username
+    password_secret_name = "acr-admin-password"
   }
 
   tags = var.common_tags
