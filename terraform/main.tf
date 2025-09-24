@@ -179,3 +179,29 @@ module "frontend" {
 
   tags = var.common_tags
 }
+
+module "log_message_processor" {
+  source = "./modules/app-service"
+
+  app_name            = "${var.app_name_prefix}-logprocessor"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  service_plan_id     = azurerm_service_plan.main.id
+
+  docker_image = "${azurerm_container_registry.main.login_server}/log-message-processor:latest"
+
+  enable_autoscaling = false
+  create_autoscale   = false
+
+  app_settings = {
+    DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.main.login_server}"
+    DOCKER_REGISTRY_SERVER_USERNAME = azurerm_container_registry.main.admin_username
+    DOCKER_REGISTRY_SERVER_PASSWORD = azurerm_container_registry.main.admin_password
+    REDIS_HOST                      = azurerm_redis_cache.main.hostname
+    REDIS_PORT                      = azurerm_redis_cache.main.port
+    REDIS_PASSWORD                  = azurerm_redis_cache.main.primary_access_key
+    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
+  }
+
+  tags = var.common_tags
+}

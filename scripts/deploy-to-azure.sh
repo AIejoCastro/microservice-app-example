@@ -32,6 +32,7 @@ SERVICES["auth"]="auth-api"
 SERVICES["users"]="users-api"
 SERVICES["todos"]="todos-api"
 SERVICES["frontend"]="frontend"
+SERVICES["logprocessor"]="log-message-processor"
 
 for SERVICE in "${!SERVICES[@]}"; do
     APP_NAME="$APP_NAME_PREFIX-$SERVICE"

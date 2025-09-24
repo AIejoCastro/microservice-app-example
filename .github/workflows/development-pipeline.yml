@@ -107,3 +107,10 @@ jobs:
       run: |
         chmod +x scripts/deploy-to-azure.sh
         scripts/deploy-to-azure.sh production
+
+    - name: Set App Settings - users-api
+      run: |
+        az webapp config appsettings set \
+          --resource-group microservice-app-rg \
+          --name microapp-users \
+          --settings WEBSITES_PORT=8080
