@@ -27,12 +27,14 @@ case $ENVIRONMENT in
     ;;
 esac
 
+# -----------------------
+# Web Apps (APIs + Frontend)
+# -----------------------
 declare -A SERVICES
 SERVICES["auth"]="auth-api"
 SERVICES["users"]="users-api"
 SERVICES["todos"]="todos-api"
 SERVICES["frontend"]="frontend"
-SERVICES["logprocessor"]="log-message-processor"
 
 for SERVICE in "${!SERVICES[@]}"; do
     APP_NAME="$APP_NAME_PREFIX-$SERVICE"
@@ -46,26 +48,14 @@ for SERVICE in "${!SERVICES[@]}"; do
         --linux-fx-version "DOCKER|$REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest"
     
     echo "Setting app configuration for $APP_NAME..."
-
-    if [ "$SERVICE" == "logprocessor" ]; then
-        # Worker: sin puerto
-        az webapp config appsettings set \
-            --name $APP_NAME \
-            --resource-group $RESOURCE_GROUP \
-            --settings \
-                WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
-                SCM_DO_BUILD_DURING_DEPLOYMENT=false
-    else
-        # Web APIs y frontend: con puerto 80
-        az webapp config appsettings set \
-            --name $APP_NAME \
-            --resource-group $RESOURCE_GROUP \
-            --settings \
-                PORT=80 \
-                WEBSITES_PORT=80 \
-                WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
-                SCM_DO_BUILD_DURING_DEPLOYMENT=false
-    fi
+    az webapp config appsettings set \
+        --name $APP_NAME \
+        --resource-group $RESOURCE_GROUP \
+        --settings \
+            PORT=80 \
+            WEBSITES_PORT=80 \
+            WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
+            SCM_DO_BUILD_DURING_DEPLOYMENT=false
     
     echo "Restarting $APP_NAME..."
     az webapp restart --name $APP_NAME --resource-group $RESOURCE_GROUP
@@ -77,5 +67,19 @@ for SERVICE in "${!SERVICES[@]}"; do
     echo "$APP_NAME state: $STATE"
 done
 
+# -----------------------
+# Container App (Log Processor)
+# -----------------------
+LOGPROCESSOR_NAME="$APP_NAME_PREFIX-logprocessor"
+IMAGE_NAME="log-message-processor"
+
+echo "Configuring $LOGPROCESSOR_NAME as a Container App..."
+az containerapp update \
+    --name $LOGPROCESSOR_NAME \
+    --resource-group $RESOURCE_GROUP \
+    --image $REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest
+
+echo "Restarting $LOGPROCESSOR_NAME..."
+az containerapp restart --name $LOGPROCESSOR_NAME --resource-group $RESOURCE_GROUP
 
 echo "Deployment to $ENVIRONMENT completed!"
