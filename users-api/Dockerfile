@@ -16,8 +16,9 @@ USER spring
 
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+# Para Spring Boot 2.x usa /actuator/health, para 1.5.x usa /health
+HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
+  CMD curl -f http://localhost:8080/health || curl -f http://localhost:8080/actuator/health || exit 1
 
 ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
 CMD java $JAVA_OPTS -jar app.jar

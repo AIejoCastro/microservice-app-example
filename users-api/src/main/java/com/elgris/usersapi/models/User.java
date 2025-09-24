@@ -9,13 +9,18 @@ public class User {
     @Id
     @Column
     private String username;
+    
     @Column
     private String firstname;
+    
     @Column
     private String lastname;
+    
     @Column
+    @Enumerated(EnumType.ORDINAL) // Esto permite usar números: 0=USER, 1=ADMIN
     private UserRole role;
 
+    // Getters y setters (los mismos que tienes)...
     public String getUsername() {
         return username;
     }
