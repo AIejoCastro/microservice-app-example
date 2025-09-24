@@ -32,6 +32,7 @@ SERVICES["auth"]="auth-api"
 SERVICES["users"]="users-api"
 SERVICES["todos"]="todos-api"
 SERVICES["frontend"]="frontend"
+SERVICES["logprocessor"]="log-message-processor"
 
 for SERVICE in "${!SERVICES[@]}"; do
     APP_NAME="$APP_NAME_PREFIX-$SERVICE"
@@ -39,22 +40,32 @@ for SERVICE in "${!SERVICES[@]}"; do
     
     echo "Configuring $APP_NAME with image $REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest..."
     
-    # Configurar la imagen Docker
     az webapp config set \
         --name $APP_NAME \
         --resource-group $RESOURCE_GROUP \
         --linux-fx-version "DOCKER|$REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest"
     
-    # Configurar variables de entorno esenciales
     echo "Setting app configuration for $APP_NAME..."
-    az webapp config appsettings set \
-        --name $APP_NAME \
-        --resource-group $RESOURCE_GROUP \
-        --settings \
-            PORT=80 \
-            WEBSITES_PORT=80 \
-            WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
-            SCM_DO_BUILD_DURING_DEPLOYMENT=false
+
+    if [ "$SERVICE" == "logprocessor" ]; then
+        # Worker: sin puerto
+        az webapp config appsettings set \
+            --name $APP_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --settings \
+                WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
+                SCM_DO_BUILD_DURING_DEPLOYMENT=false
+    else
+        # Web APIs y frontend: con puerto 80
+        az webapp config appsettings set \
+            --name $APP_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --settings \
+                PORT=80 \
+                WEBSITES_PORT=80 \
+                WEBSITES_ENABLE_APP_SERVICE_STORAGE=false \
+                SCM_DO_BUILD_DURING_DEPLOYMENT=false
+    fi
     
     echo "Restarting $APP_NAME..."
     az webapp restart --name $APP_NAME --resource-group $RESOURCE_GROUP
@@ -65,5 +76,6 @@ for SERVICE in "${!SERVICES[@]}"; do
     STATE=$(az webapp show --name $APP_NAME --resource-group $RESOURCE_GROUP --query "state" -o tsv)
     echo "$APP_NAME state: $STATE"
 done
+
 
 echo "Deployment to $ENVIRONMENT completed!"
