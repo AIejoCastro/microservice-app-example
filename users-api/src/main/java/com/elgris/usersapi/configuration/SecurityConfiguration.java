@@ -21,8 +21,14 @@ class HttpSecurityConfiguration {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/**")
-                    .addFilterAfter(jwtAuthenticationFilter, BasicAuthenticationFilter.class);
+            http
+                .csrf().disable()
+                .authorizeRequests()
+                    .antMatchers("/actuator/health", "/health", "/actuator/health/**").permitAll()
+                    .antMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                    .anyRequest().authenticated()
+                .and()
+                .addFilterAfter(jwtAuthenticationFilter, BasicAuthenticationFilter.class);
         }
     }
 }

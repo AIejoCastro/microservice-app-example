@@ -26,7 +26,14 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
+        final String requestUri = request.getRequestURI();
         final String authHeader = request.getHeader("authorization");
+
+        // Allow health checks and preflight without auth
+        if (requestUri != null && (requestUri.equals("/health") || requestUri.startsWith("/actuator/health"))) {
+            chain.doFilter(req, res);
+            return;
+        }
 
         if ("OPTIONS".equals(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
