@@ -217,6 +217,14 @@ resource "azurerm_container_app" "log_message_processor" {
         name  = "APPINSIGHTS_INSTRUMENTATIONKEY"
         value = azurerm_application_insights.main.instrumentation_key
       }
+      env {
+        name  = "REDIS_CHANNEL"
+        value = "logs"
+      }
+      env {
+        name  = "ZIPKIN_URL"
+        value = "http://${var.app_name_prefix}-zipkin:9411/api/v1/spans"
+      }
     }
   }
 
