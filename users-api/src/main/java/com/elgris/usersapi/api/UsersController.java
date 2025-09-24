@@ -13,14 +13,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/users")
 public class UsersController {
 
     @Autowired
     private UserRepository userRepository;
 
-
     @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String root() {
+        return "OK";
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<User> getUsers() {
         List<User> response = new LinkedList<>();
         userRepository.findAll().forEach(response::add);
@@ -28,7 +31,7 @@ public class UsersController {
         return response;
     }
 
-    @RequestMapping(value = "/{username}",  method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{username}",  method = RequestMethod.GET)
     public User getUser(HttpServletRequest request, @PathVariable("username") String username) {
 
         Object requestAttribute = request.getAttribute("claims");
