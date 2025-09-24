@@ -73,13 +73,10 @@ done
 LOGPROCESSOR_NAME="$APP_NAME_PREFIX-logprocessor"
 IMAGE_NAME="log-message-processor"
 
-echo "Configuring $LOGPROCESSOR_NAME as a Container App..."
+echo "Updating $LOGPROCESSOR_NAME as a Container App..."
 az containerapp update \
     --name $LOGPROCESSOR_NAME \
     --resource-group $RESOURCE_GROUP \
     --image $REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest
 
-echo "Restarting $LOGPROCESSOR_NAME..."
-az containerapp restart --name $LOGPROCESSOR_NAME --resource-group $RESOURCE_GROUP
-
-echo "Deployment to $ENVIRONMENT completed!"
+echo "$LOGPROCESSOR_NAME updated successfully!"
