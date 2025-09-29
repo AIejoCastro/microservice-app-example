@@ -15,3 +15,13 @@ In each folder you can find a more in-depth explanation of each component:
 
 Take a look at the components diagram that describes them and their interactions.
 ![microservice-app-example](/arch-img/Microservices.png)
+
+## Documentation
+
+- Architecture: `docs/architecture.md`
+- Services: `docs/services/`
+- Local development: `docs/local-dev.md`
+- Infrastructure (Terraform/Azure): `docs/infrastructure.md`
+- Pipelines (GitHub Actions): `docs/pipelines.md`
+- Observability: `docs/observability.md`
+- Security: `docs/security.md`
