@@ -2,6 +2,9 @@
 
 This project is a microservices-based TODO application composed of independent services, a single-page frontend, shared cache, and optional monitoring stack. Services communicate over HTTP and Redis pub/sub for async logging.
 
+### Architecture Diagram
+![Architecture Diagram](../arch-img/DiagramaArquitectura.png)
+
 ### Components
 - Auth API (`auth-api`, Go): issues JWTs via `POST /login` using static demo users. Uses Redis for cache-aside.
 - Users API (`users-api`, Java Spring Boot): exposes user data via `GET /users` and `GET /users/:username`. Uses Redis cache-aside.

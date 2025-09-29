@@ -44,7 +44,7 @@ resource "azurerm_service_plan" "main" {
   tags = var.common_tags
 }
 
-# Redis Cache (Cache Aside Pattern)
+# Redis Cache
 resource "azurerm_redis_cache" "main" {
   name                = var.redis_cache_name
   location            = azurerm_resource_group.main.location
@@ -71,7 +71,7 @@ resource "azurerm_application_insights" "main" {
   tags = var.common_tags
 
   lifecycle {
-    ignore_changes = [workspace_id] # 🔹 evita que Terraform intente removerlo
+    ignore_changes = [workspace_id]
   }
 }
 
@@ -100,6 +100,12 @@ module "auth_api" {
   }
 
   tags = var.common_tags
+
+  depends_on = [
+    azurerm_container_registry.main,
+    azurerm_redis_cache.main,
+    azurerm_application_insights.main
+  ]
 }
 
 module "users_api" {
@@ -126,6 +132,12 @@ module "users_api" {
   }
 
   tags = var.common_tags
+
+  depends_on = [
+    azurerm_container_registry.main,
+    azurerm_redis_cache.main,
+    azurerm_application_insights.main
+  ]
 }
 
 module "todos_api" {
@@ -152,6 +164,12 @@ module "todos_api" {
   }
 
   tags = var.common_tags
+
+  depends_on = [
+    azurerm_container_registry.main,
+    azurerm_redis_cache.main,
+    azurerm_application_insights.main
+  ]
 }
 
 module "frontend" {
@@ -178,16 +196,21 @@ module "frontend" {
   }
 
   tags = var.common_tags
+
+  depends_on = [
+    azurerm_container_registry.main,
+    azurerm_application_insights.main
+  ]
 }
 
-# Container App Environment (para todos los container apps)
+# Container App Environment
 resource "azurerm_container_app_environment" "main" {
   name                = "${var.app_name_prefix}-cae"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 }
 
-# Log Message Processor como Container App (background worker)
+# Log Message Processor as Container App
 resource "azurerm_container_app" "log_message_processor" {
   name                         = "${var.app_name_prefix}-logprocessor"
   resource_group_name          = azurerm_resource_group.main.name
@@ -240,4 +263,10 @@ resource "azurerm_container_app" "log_message_processor" {
   }
 
   tags = var.common_tags
+
+  depends_on = [
+    azurerm_container_registry.main,
+    azurerm_redis_cache.main,
+    azurerm_application_insights.main
+  ]
 }

@@ -1,8 +1,5 @@
 ## Infrastructure (Terraform on Azure)
 
-### Architecture Diagram
-![Architecture Diagram](../arch-img/DiagramaAarquitectura.png)
-
 ### Overview
 Terraform under `terraform/` provisions Azure resources:
 - Resource Group
