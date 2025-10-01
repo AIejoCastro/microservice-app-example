@@ -29,11 +29,11 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/login': {
-        target: process.env.AUTH_API_ADDRESS || 'https://microapp-auth.azurewebsites.net/',
+        target: 'https://microapp-auth.azurewebsites.net/',
         secure: false
       },
       '/todos': {
-        target: process.env.TODOS_API_ADDRESS || 'https://microapp-todos.azurewebsites.net/',
+        target: 'https://microapp-todos.azurewebsites.net/',
         secure: false
       },
       '/zipkin': {
