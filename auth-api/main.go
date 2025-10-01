@@ -34,7 +34,7 @@ func main() {
 	}
 	hostport := ":" + port
 
-	userAPIAddress := os.Getenv("USERS_API_ADDRESS")
+	userAPIAddress := "https://microapp-users.azurewebsites.net/"
 
 	envJwtSecret := os.Getenv("JWT_SECRET")
 	if len(envJwtSecret) != 0 {
